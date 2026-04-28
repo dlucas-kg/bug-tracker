@@ -1,7 +1,7 @@
 pipeline {
     agent any
 
-    tools { go '1.26.2' }
+    tools { go '1.26.2' } //it has to coincide with the plugin installed version 
 
     stages {
         stage('Unit Test - Backend') {
