@@ -1,7 +1,7 @@
 pipeline {
     agent any
 
-    tools { go '1.21' }
+    tools { go '1.26.2' }
 
     stages {
         stage('Unit Test - Backend') {
