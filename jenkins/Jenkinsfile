@@ -1,21 +1,35 @@
 pipeline {
     agent any
 
-    tools { go '1.26.2' } //it has to coincide with the plugin installed version 
+    tools { 
+        go '1.26.2'
+        nodejs '25.9.9'
+    } //it has to coincide with the plugin installed version 
 
     stages {
-        stage('Unit Test - Backend') {
-            // agent{
-            //     docker {                              //pulling a docker instance with everything needed to run the tests
-            //         image 'snakee/golang-junit:1.21' //it can be repleaced by a jenkins plugin tho
-            //         reuseNode true
-            //     }
-            // }
-            steps {
-                dir('bugtracker-backend'){
-                    sh 'go test -v ./...'
+        // stage('Unit Test - Backend') {
+        //     // agent{
+        //     //     docker {                              //pulling a docker instance with everything needed to run the tests
+        //     //         image 'snakee/golang-junit:1.21' //it can be repleaced by a jenkins plugin tho
+        //     //         reuseNode true
+        //     //     }
+        //     // }
+        //     steps {
+        //         dir('bugtracker-backend'){
+        //             sh 'go test -v ./...'
+        //         }
+        //     }
+        // }
+        stage('Unit Test - Frontend'){
+            steps{
+                dir('bugtracker-frontend'){
+                    sh '''
+                        npm ci 
+                        npm test
+                    '''
                 }
             }
         }
     }
+
 }
