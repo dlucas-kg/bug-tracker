@@ -16,10 +16,30 @@ pipeline {
             // }
             steps {
                 dir('bugtracker-backend'){
-                    sh 'go test -v ./...'
+                    sh '''
+                        go test -v ./...
+                        
+                        #Generate cover reports
+                        go test -coverprofile=coverage.out -covermode=atomic ./...
+                        go tool cover -html=coverage.out -o coverage.html
+                        
+                        mkdir -p reports
+                        mv coverage.html reports/
+                        '''
+                }
+            }
+            post{
+                always{
+                    //junit 'bugtracker-frontend/test-result.xml' //this is a way to do it, but need to run test locally, which doesn't makes sense for this implementation
+                    publishHTML target:[
+                        reportDir: 'bugtracker-backend/reports'
+                        reportFiles: 'coverage.html'
+                        reportName: 'Backend Coverage Report'
+                    ]
                 }
             }
         }
+
         stage('Unit Test - Frontend'){
             agent { 
                 docker { 
@@ -36,11 +56,12 @@ pipeline {
                     '''
                 }
             }
-            post{
-                always{
-                    junit 'bugtracker-frontend/test-result.xml' //this is a way to do it, but need to run test locally, which doesn't makes sense for this implementation
-                }
-            }
+            // post{
+            //     always{
+            //         //junit 'bugtracker-frontend/test-result.xml' //this is a way to do it, but need to run test locally, which doesn't makes sense for this implementation
+                   
+            //     }
+            // }
         }
     }
 
