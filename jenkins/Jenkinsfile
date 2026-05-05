@@ -3,7 +3,7 @@ pipeline {
 
     tools { 
         go '1.26.2'
-        nodejs 'NodeJS' //it has to coincide with the Name in tool config 
+      //  nodejs 'NodeJS' //it has to coincide with the Name in tool config 
     } //it has to coincide with the plugin installed version 
 
     stages {
@@ -21,6 +21,13 @@ pipeline {
         //     }
         // }
         stage('Unit Test - Frontend'){
+            agent { 
+                docker { 
+                    image 'node:18-alpine' 
+                    reuseNode true    
+                } 
+
+            }
             steps{
                 dir('bugtracker-frontend'){
                     sh '''
