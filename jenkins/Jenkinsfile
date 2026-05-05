@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     tools { 
-        go '1.26.2'
-      //  nodejs 'NodeJS' //it has to coincide with the Name in tool config 
-    } //it has to coincide with the plugin installed version 
+        go '1.26.2' //it has to coincide with the plugin installed version 
+      //nodejs 'NodeJS' //it has to coincide with the Name in tool config 
+    }                   
 
     stages {
         stage('Unit Test - Backend') {
@@ -19,7 +19,7 @@ pipeline {
                     sh 'go test -v ./...'
                 }
             }
-        // }
+        }
         stage('Unit Test - Frontend'){
             agent { 
                 docker { 
