@@ -31,9 +31,9 @@ pipeline {
             post{
                 always{
                     //junit 'bugtracker-frontend/test-result.xml' //this is a way to do it, but need to run test locally, which doesn't makes sense for this implementation
-                    publishHTML target: [
-                        reportDir: 'bugtracker-backend/reports'
-                        reportFiles: 'coverage.html'
+                    publishHTML target:[
+                        reportDir: 'bugtracker-backend/reports',
+                        reportFiles: 'coverage.html',
                         reportName: 'Backend Coverage Report'
                     ]
                 }
