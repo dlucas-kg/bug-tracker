@@ -7,66 +7,70 @@ pipeline {
     }                   
 
     stages {
-        stage('Unit Test - Backend') {
+        stage('Execute Unit Tests'){
+            parallel{
+                stage('Unit Test - Backend') {
             // agent{
             //     docker {                              //pulling a docker instance with everything needed to run the tests
             //         image 'snakee/golang-junit:1.21' //it can be repleaced by a jenkins plugin tho
             //         reuseNode true
             //     }
             // }
-            steps {
-                dir('bugtracker-backend'){
-                    sh '''
-                        go test -v ./...
-                        
-                        #Generate cover reports
-                        go test -coverprofile=coverage.out -covermode=atomic ./...
-                        go tool cover -html=coverage.out -o coverage.html
-                        
-                        mkdir -p reports
-                        mv coverage.html reports/
-                        '''
+                    steps {
+                        dir('bugtracker-backend'){
+                            sh '''
+                                go test -v ./...
+                                
+                                #Generate cover reports
+                                go test -coverprofile=coverage.out -covermode=atomic ./...
+                                go tool cover -html=coverage.out -o coverage.html
+                                
+                                mkdir -p reports
+                                mv coverage.html reports/
+                                '''
+                        }
+                    }
+                    post{
+                        always{
+                            //junit 'bugtracker-frontend/test-result.xml' //this is a way to do it, but need to run test locally, which doesn't makes sense for this implementation
+                            publishHTML target:[
+                                reportDir: 'bugtracker-backend/reports',
+                                reportFiles: 'coverage.html',
+                                reportName: 'Backend Coverage Report'
+                            ]
+                        }
+                    }
                 }
-            }
-            post{
-                always{
-                    //junit 'bugtracker-frontend/test-result.xml' //this is a way to do it, but need to run test locally, which doesn't makes sense for this implementation
-                    publishHTML target:[
-                        reportDir: 'bugtracker-backend/reports',
-                        reportFiles: 'coverage.html',
-                        reportName: 'Backend Coverage Report'
-                    ]
-                }
-            }
-        }
 
-        stage('Unit Test - Frontend'){
-            agent { 
-                docker { 
-                    image 'node:18-alpine' 
-                    reuseNode true    
-                } 
+                stage('Unit Test - Frontend'){
+                    agent { 
+                        docker { 
+                            image 'node:18-alpine' 
+                            reuseNode true    
+                        } 
 
-            }
-            steps{
-                dir('bugtracker-frontend'){
-                    sh '''
-                        npm ci 
-                        npm test
-                        mkdir -p reports
-                        mv coverage reports/ 
-                    '''
-                }
-            }
-            post{
-                always{
-                    //junit 'bugtracker-frontend/test-result.xml' //this is a way to do it, but need to run test locally, which doesn't makes sense for this implementation
-                    publishHTML target:[
-                        reportDir: 'bugtracker-frontend/reports/coverage',
-                        reportFiles: 'index.html',
-                        reportName: 'Frontend Coverage Report'
-                    ]
-                   
+                    }
+                    steps{
+                        dir('bugtracker-frontend'){
+                            sh '''
+                                npm ci 
+                                npm test
+                                mkdir -p reports
+                                mv coverage reports/ 
+                            '''
+                        }
+                    }
+                    post{
+                        always{
+                            //junit 'bugtracker-frontend/test-result.xml' //this is a way to do it, but need to run test locally, which doesn't makes sense for this implementation
+                            publishHTML target:[
+                                reportDir: 'bugtracker-frontend/reports/coverage',
+                                reportFiles: 'index.html',
+                                reportName: 'Frontend Coverage Report'
+                            ]
+                        
+                        }
+                    }
                 }
             }
         }
