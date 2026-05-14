@@ -89,18 +89,16 @@ pipeline {
         stage('Api Tests'){
             agent{
                 docker{
-                    image 'mcr.microsoft.com/playwright:v1.50.0-noble'
+                    image 'mcr.microsoft.com/playwright:v1.50.0-jammy'
                     reuseNode true
-                    args '-u 0 --network=host --ipc=host'
+                    args '-u 0 --network=host'
                 }
             }
             steps{
                 dir('tests-api'){
-
-                    sh 'npm ci'
-
                     sh 'npx wait-port http://localhost:8080/api/health -t 30000'
 
+                    sh 'npm ci'
                     sh 'npx playwright test'
                 }
             }
