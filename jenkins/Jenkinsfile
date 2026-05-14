@@ -91,14 +91,16 @@ pipeline {
                 docker{
                     image 'mcr.microsoft.com/playwright:v1.50.0-jammy'
                     reuseNode true
-                    args '-u 0 --network=host'
+                    args '-u 0 --network=host --ipc=host'
                 }
             }
             steps{
                 dir('tests-api'){
-                    sh 'npx wait-port http://localhost:8080/api/health -t 30000'
 
                     sh 'npm ci'
+
+                    sh 'npx wait-port http://localhost:8080/api/health -t 30000'
+
                     sh 'npx playwright test'
                 }
             }
